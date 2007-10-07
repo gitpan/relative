@@ -5,7 +5,7 @@ use UNIVERSAL::require;
 
 {
     no strict "vars";
-    $VERSION = '0.01';
+    $VERSION = '0.02';
 }
 
 =head1 NAME
@@ -14,7 +14,7 @@ relative - Load modules with relative names
 
 =head1 VERSION
 
-Version 0.01
+Version 0.02
 
 =cut
 
@@ -22,6 +22,7 @@ sub import {
     return if @_ <= 1;  # called with no args
     my ($package, @modules) = @_;
     my ($caller) = caller();
+    my @loaded = ();
 
     # read the optional parameters
     my %param = ();
@@ -32,8 +33,9 @@ sub import {
     elsif (ref $modules[0] eq 'ARRAY') {
         %param = @{shift @modules}
     }
-    elsif ($modules[0] eq 'to') {
-        %param = ( shift(@modules) => shift @modules )
+    elsif ($modules[0] eq '-to') {
+        shift @modules;
+        %param = ( to => shift @modules );
     }
 
     # determine the base name
@@ -52,7 +54,12 @@ sub import {
 
         # import the symbols from the loaded module into the caller module
         eval qq{ package $caller; $module->import };
+
+        # keep a list of the loaded modules
+        push @loaded, $module;
     }
+
+    return wantarray ? @loaded : $loaded[-1]
 }
 
 
@@ -66,16 +73,30 @@ sub import {
     use relative qw(..::Utils);
     # loads BigApp::Utils
 
-    use relative to => "Enterprise::Framework" => qw(Base Factory);
-    # loads Enterprise::Framework:Base, Enterprise::Framework::Factory
+    use relative -to => "Enterprise::Framework" => qw(Base Factory);
+    # loads Enterprise::Framework::Base, Enterprise::Framework::Factory
 
 
 =head1 DESCRIPTION
 
 This module allows you to load modules using only parts of their name, 
-relatively to the caller module. Module names are by default searched 
-below the current module, but can be searched upper in the hierarchy
-using the C<..::> syntax.
+relatively to the current module or to a given module. Module names are 
+by default searched below the current module, but can be searched upper 
+in the hierarchy using the C<..::> syntax.
+
+In order to further loosen the namespace coupling, C<import> returns 
+the full names of the loaded modules, making object-oriented code easier
+to write:
+
+    use relative;
+
+    my ($Maker, $Publisher) = import relative qw(Create Publish);
+    my $report = $Maker->new;
+    my $publisher = $Publisher->new;
+
+    my ($Base, $Factory) = import relative -to => "Enterprise::Framework"
+                                => qw(Base Factory);
+    my $thing = $Factory->new;
 
 
 =head1 IMPORT OPTIONS
@@ -84,17 +105,22 @@ Import options can be given as an hashref or an arrayref as the first
 argument:
 
     # options as a hashref
-    use relative { param => value, ... }  qw(Name ...);
+    import relative { param => value, ... }  qw(Name ...);
 
     # options as an arrayref
-    use relative [ param => value, ... ]  qw(Name ...);
+    import relative [ param => value, ... ]  qw(Name ...);
 
 In order to simplify the syntax, the following shortcut is also valid:
 
-    use relative to => "Another::Hierarchy" => qw(Name ...)
+    import relative -to => "Another::Hierarchy" => qw(Name ...)
 
 Only one parameter is currently supported, C<to>, which can be used to 
 indicate another hierarchy to search modules inside.
+
+C<import> will C<die> as soon as a module can't be loaded. 
+
+C<import> returns the full names of the loaded modules when called in 
+list context, or the last one when called in scalar context.
 
 
 =head1 AUTHOR
@@ -140,7 +166,8 @@ L<http://search.cpan.org/dist/relative>
 
 =head1 ACKNOWLEDGEMENTS
 
-Thanks to Aristotle Pagaltzis and Andy Armstrong for their advice.
+Thanks to Aristotle Pagaltzis, Andy Armstrong and Ken Williams 
+for their suggestions and ideas.
 
 
 =head1 COPYRIGHT & LICENSE
