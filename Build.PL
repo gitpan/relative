@@ -4,7 +4,7 @@ use Module::Build;
 my $builder = Module::Build->new(
     module_name         => 'relative',
     license             => 'perl',
-    dist_author         => 'Sébastien Aperghis-Tramoni <sebastien@aperghis.net>',
+    dist_author         => 'Sebastien Aperghis-Tramoni <sebastien@aperghis.net>',
     dist_version_from   => 'lib/relative.pm',
     requires => {
         'UNIVERSAL::require' => 0,

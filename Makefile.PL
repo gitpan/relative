@@ -4,11 +4,14 @@ use ExtUtils::MakeMaker;
 WriteMakefile(
     NAME                => 'relative',
     license             => 'perl',
-    AUTHOR              => 'Sébastien Aperghis-Tramoni <sebastien@aperghis.net>',
+    AUTHOR              => 'Sebastien Aperghis-Tramoni <sebastien@aperghis.net>',
     VERSION_FROM        => 'lib/relative.pm',
     ABSTRACT_FROM       => 'lib/relative.pm',
     PREREQ_PM => {
+        # prereqs
         'UNIVERSAL::require' => 0,
+
+        # build/tests prereqs
         'Test::More'    => 0,
     },
     PL_FILES            => {},

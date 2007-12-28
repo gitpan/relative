@@ -3,5 +3,5 @@ use strict;
 use Test::More;
 use lib "t";
 
-plan tests => 26;
+plan tests => 30;
 use_ok( "BigApp::Report" );
