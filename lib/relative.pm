@@ -5,7 +5,7 @@ use UNIVERSAL::require;
 
 {
     no strict "vars";
-    $VERSION = '0.03';
+    $VERSION = '0.04';
 }
 
 =head1 NAME
@@ -14,7 +14,7 @@ relative - Load modules with relative names
 
 =head1 VERSION
 
-Version 0.03
+Version 0.04
 
 =cut
 
@@ -94,7 +94,7 @@ sub import {
         $module =~ s/^:://;
 
         # load the module, die if it failed
-        $module->require or croak $@;
+        $module->require or croak _clean($@);
 
         # import the symbols from the loaded module into the caller module
         if (exists $args_for{$relname}) {
@@ -104,12 +104,13 @@ sub import {
             # there are some arguments
             if (@$args) {
                 my $args_str = join ", ", map {"q/\Q$_\E/"} @$args;
-                eval qq{ package $caller; $module->import($args_str); 1 } or croak $@;
+                eval qq{ package $caller; $module->import($args_str); 1 }
+                    or croak _clean($@);
             }
         }
         else {
             # use the default import method
-            eval qq{ package $caller; $module->import; 1 } or croak $@;
+            eval qq{ package $caller; $module->import; 1 } or croak _clean($@);
         }
 
         # define alias if asked to
@@ -123,6 +124,13 @@ sub import {
     }
 
     return wantarray ? @loaded : $loaded[-1]
+}
+
+
+sub _clean {
+    my ($msg) = @_;
+    $msg =~ s/ at .*relative.pm line \d+\.\s*$//s;
+    return $msg
 }
 
 

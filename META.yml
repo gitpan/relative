@@ -1,6 +1,6 @@
 ---
 name: relative
-version: 0.03
+version: 0.04
 author:
   - 'Sebastien Aperghis-Tramoni <sebastien@aperghis.net>'
 abstract: Load modules with relative names
@@ -14,7 +14,7 @@ build_requires:
 provides:
   relative:
     file: lib/relative.pm
-    version: 0.03
+    version: 0.04
 generated_by: Module::Build version 0.2808
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.2.html
